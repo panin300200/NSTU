@@ -12,8 +12,8 @@ private:
 
 
     // n - размерность. begin - первый элемент(индекс). end - последний элемент(индекс).
-    int n = NULL, begin = -1, end = begin;
-    char* ch; // как сделать тип который захочет пользователь?
+    int size = NULL, begin = -1, end = begin;
+    char* array; // как сделать тип который захочет пользователь?
 
 
 public:
@@ -27,17 +27,17 @@ public:
 
 
     // задать размерность очереди
-    void size(int a) {
-        n = a;
-        ch = new char[n];
+    void size(int n) {
+        size = n;
+        array = new char[size];
         clear();
     }
 
 
     // удаление памяти под матрицу
     void del() {
-        if(n == NULL)
-            delete[] ch;
+        if(size != NULL)
+            delete[] array;
     }
 
 
@@ -51,16 +51,16 @@ public:
     bool has_size() {
         if (empty())
             return true;
-        return end + 1 != n;
+        return end + 1 != size;
     }
 
 
     // взятие первого элемента
     char pop(char s) {
         if (!empty()) {
-            s = ch[begin];
+            s = array[begin];
             for (int i = 0; i < end; i++) {
-                ch[i] = ch[i + 1];
+                array[i] = array[i + 1];
             }
             end--;
             if (begin > end)
@@ -74,7 +74,7 @@ public:
     // значение первого элемента
     char getf() {
         if (!empty())
-            return ch[begin];
+            return array[begin];
         return '\0';
     }
 
@@ -82,14 +82,14 @@ public:
     // значение последнего элемента
     char getl() {
         if (!empty())
-            return ch[end];
+            return array[end];
         return '\0';
     }
 
 
     // добавить элемент в очередь
     void push(char s) {
-        ch[++end] = s;
+        array[++end] = s;
         if (empty())
             begin = end;
     }
@@ -99,7 +99,7 @@ public:
     void print() {
         if (!empty())
             for (int i = begin; i < end + 1; i++)
-                cout << ch[i] << ' ';
+                cout << array[i] << ' ';
         cout << endl << endl;;
     }
 
@@ -108,27 +108,27 @@ public:
     void priority() {
 
         if (!empty()) {
-            char* copy_ch = new char[end - begin + 1]; // массив
+            char* copy_array = new char[end - begin + 1]; // массив
 
 
             // копирование массив
             for (int i = begin; i < end - begin + 1; i++)
-                copy_ch[i] = ch[i];
+                copy_array[i] = array[i];
 
 
             for (int i = begin; i < end; i++) {
                 for (int k = i + 1; k < end - begin + 1; k++) {
-                    if (ch[i] > copy_ch[k]) {
-                        ch[k] = ch[i];
-                        ch[i] = copy_ch[k];
-                        copy_ch[k] = ch[k];
+                    if (array[i] > copy_array[k]) {
+                        array[k] = array[i];
+                        array[i] = copy_array[k];
+                        copy_array[k] = array[k];
                     }
                 }
             }
 
 
             // очистка копии и вывод оснв. массив
-            delete[] copy_ch;
+            delete[] copy_array;
             print();
         }
     }
@@ -147,17 +147,17 @@ private:
     //список двухсвязный
     struct list {
         char data;
-        list* next, * prev;
-    }  *end = nullptr, * p = end, * del;
+        list* next, * previous;
+    }  *end = nullptr, * begin = end, * del;
 
 
     //создание первого элемента
     void create(char s) {
         end = new list;
-        p = end;
+        begin = end;
         end->data = s;
-        end->next = p;
-        end->prev = p;
+        end->next = begin;
+        end->previous = begin;
 
 
     }
@@ -178,10 +178,10 @@ public:
             create(s);
         else {
             end->next = new list;
-            end->next->prev = end;
+            end->next->previous = end;
             end = end->next;
-            end->next = p;
-            p->prev = end;
+            end->next = begin;
+            begin->previous = end;
             end->data = s;
         }
     }
@@ -190,7 +190,7 @@ public:
     //получить первый элемент;
     char getf() {
         if (!is_empty()) {
-            return p->data;
+            return begin->data;
         }
         return '\0';
     }
@@ -199,7 +199,7 @@ public:
     //получить последний элемент
     char getl() {
         if(!is_empty()) {
-            return p->prev->data;
+            return begin->previous->data;
         }
         return '\0';
     }
@@ -208,16 +208,16 @@ public:
     //взять элемент
     char pop(char s) {
         if (!is_empty()) {
-            s = p->data;
-            del = p;
-            if (p == p->next) {
+            s = begin->data;
+            del = begin;
+            if (begin == begin->next) {
                 end = nullptr;
-                p = end;
+                begin = end;
             }
             else {
-                p = p->next;
-                p->prev = end;
-                end->next = p;
+                begin = begin->next;
+                begin->previous = end;
+                end->next = begin;
             }
             delete del;
             return s;
@@ -228,19 +228,93 @@ public:
 
     //oчистить очередь
     void clear() {
-        for (end = p->next; end != p; del = end, end = end->next, delete del);
-        delete p;
+        for (end = begin->next; end != begin; del = end, end = end->next, delete del);
+        delete begin;
         end = nullptr;
-        p = end;
+        begin = end;
     }
 
 
     //распечатать очередь
     void print() {
-        for (end = p; end->next != p; end = end->next) {
+        for (end = begin; end->next != begin; end = end->next) {
             cout << end->data << ' ';
         }
         cout << end->data << ' ' << endl;
+    }
+
+
+};
+
+
+// класс статического стэка (динамический массив)
+class Stack {
+private:
+
+
+    //размерность стэка и индекс-указатель на последний элемент
+    int size = NULL, top = -1;
+    char* array;
+
+
+public:
+
+
+    // задать размерность стэка
+    void size(int n) {
+        size = n;
+        array = new char[size];
+        clear();
+    }
+
+
+    // проверка на пустоту
+    bool empty() {
+        return !(top + 1);
+    }
+
+
+    // взять последний элемент
+    char pop() {
+        if (!empty())
+            return array[top--];
+        return '\0';
+    }
+
+
+    // получить последний элемент
+    char back() {
+        if (!empty())
+            return array[top];
+        return '\0';
+    }
+
+
+    // добавить элемент в конец
+    void push(char s) {
+        if (top < size)
+            array[++top] = s;
+    }
+
+
+    // очистка стэка
+    void clear() {
+        top = -1;
+    }
+
+
+    // распечатать стэк
+    void print() {
+        if (!empty())
+            for (int i = 0; i < top + 1; i++)
+                cout << array[i] << ' ';
+    }
+
+
+    // удалить массив(стэк)
+    void del() {
+        if (size != NULL)
+            delete[] array;
     }
 
 
