@@ -42,22 +42,29 @@ public:
 
     // взятие первого элемента
     char pop(char s) {
-        s = ch[begin++];
-        if(begin > end)
-            clear();
-        return s;
+        if(!empty()) {
+            s = ch[begin++];
+            if(begin > end)
+                clear();
+            return s;
+       }
+       return '\0';
     }
 
 
     // значение первого элемента
     char getf() {
+        if(!empty())
             return ch[begin];
+        return '\0';
     }
 
 
     // значение последнего элемента
     char getl() {
-        return ch[end];
+        if(!empty())
+            return ch[end];
+        return '\0';
     }
 
 
