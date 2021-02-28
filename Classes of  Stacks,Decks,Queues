@@ -1,0 +1,187 @@
+#include <iostream>
+
+
+using std::cin;
+using std::cout;
+using std::endl;
+
+
+// статическая очередь (динамический массив)
+class QueueS {
+private:
+
+
+    // n - размерность. begin - первый элемент(индекс). end - последний элемент(индекс).
+    int n = 0, begin = -1, end = begin;
+    char *ch; // как сделать тип который захочет пользователь?
+
+
+public:
+
+
+    // задать размерность очереди
+    void size() {
+        do { std::cin >> n; } while (n <= 0);
+        ch = new char[n];
+    }
+
+
+    // проверка: есть место или нет
+    bool has_size() {
+        if(empty())
+            return true;
+        return end + 1 != n ;
+    }
+
+
+    // проверка на пустоту
+    bool empty() {
+        return !(bool)(begin + 1);
+    }
+
+
+    // взятие первого элемента
+    char pop(char s) {
+        s = ch[begin++];
+        if(begin > end)
+            clear();
+        return s;
+    }
+
+
+    // значение первого элемента
+    char getf() {
+            return ch[begin];
+    }
+
+
+    // значение последнего элемента
+    char getl() {
+        return ch[end];
+    }
+
+
+    // добавить элемент в очередь
+    void push(char s) {
+       ch[++end] = s;
+        if(empty())
+            begin = end;
+    }
+
+
+    //распечатать очередь
+     void print() {
+        for(int i = begin; i < end + 1; i++)
+            cout << ch[i] << ' ';
+    }
+
+
+    // очистить очередь
+    void clear() {
+        begin = -1;
+        end = begin;
+    }
+
+
+};
+
+
+// класс динамической очереди (двухсвязный циклический список с заглавным звеном)
+class QueueD {
+
+
+private:
+
+
+    //список двухсвязный
+    struct list {
+        char data;
+        list* next, * prev;
+    }  *end = nullptr, * p = end, *del;
+
+
+    //создание первого элемента
+    void create(char s) {
+        end = new list;
+        p = end;
+        end->data = s;
+        end->next = p;
+        end->prev = p;
+
+
+    }
+
+
+public:
+
+
+    //проверка на пустоту / если пусто вернет true
+    bool is_empty() {
+        return end == nullptr;
+    }
+
+
+    //новый элемент
+    void push(char s) {
+        if (is_empty())
+            create(s);
+        else {
+            end->next = new list;
+            end->next->prev = end;
+            end = end->next;
+            end->next = p;
+            p->prev = end;
+            end->data = s;
+        }
+    }
+
+
+    //получить первый элемент;
+    char getf() {
+        return p->data;
+    }
+
+
+    //получить последний элемент
+    char getl() {
+        return p->prev->data;
+    }
+
+
+    //взять элемент
+    char pop(char s) {
+            s = p->data;
+            del = p;
+        if (p == p->next) {
+            end = nullptr;
+            p = end;
+        }
+        else {
+            p = p->next;
+            p->prev = end;
+            end->next = p;
+        }
+            delete del;
+            return s;
+    }
+
+
+    //oчистить очередь
+    void clear() {
+            for (end = p->next; end != p; del = end, end = end->next, delete del);
+            delete p;
+            end = nullptr;
+            p = end;
+    }
+
+
+    //распечатать очередь
+    void print() {
+            for(end = p; end->next != p; end = end->next) {
+                cout << end->data << ' ';
+            }
+            cout << end->data << ' ';
+    }
+
+
+};
