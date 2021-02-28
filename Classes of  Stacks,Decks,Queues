@@ -20,8 +20,8 @@ public:
 
 
     // задать размерность очереди
-    void size() {
-        do { std::cin >> n; } while (n <= 0);
+    void size(int a) {
+        n = a;
         ch = new char[n];
     }
 
