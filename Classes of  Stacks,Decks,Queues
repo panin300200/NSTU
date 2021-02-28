@@ -27,7 +27,7 @@ public:
 
 
     // задать размерность очереди
-    void size(int n) {
+    void size_of(int n) {
         size = n;
         array = new char[size];
         clear();
