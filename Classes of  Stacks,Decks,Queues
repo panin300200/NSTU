@@ -12,7 +12,7 @@ private:
 
 
     // n - размерность. begin - первый элемент(индекс). end - последний элемент(индекс).
-    int size = NULL, begin, end;
+    int size, begin, end;
     char* array; // как сделать тип который захочет пользователь?
 
 
@@ -27,35 +27,30 @@ public:
 
 
     // задать размерность очереди
-    QueueS(int n) {
-        this->~QueueS();
-        size = n;
-        array = new char[size];
+    QueueS(int n = NULL) {
+        size = n; // Если больше нуля и не равно NULL, то создать массив
+        if(size)
+            array = new char[size];
         clear();
     }
 
 
     // удаление памяти под матрицу
     ~QueueS() {
-        if (size != NULL) {
+        if (size != NULL)
             delete[] array;
-            size = NULL;
-            clear();
-        }
     }
 
 
     // проверка на пустоту
     bool empty() {
-        return !((bool)(begin + 1) || size == NULL);
+        return !(bool)(begin + 1) || size == NULL;
     }
 
 
     // проверка: есть место или нет
     bool has_size() {
-        if (empty())
-            return true;
-        return end + 1 != size;
+        return end + 1 < size;
     }
 
 
@@ -93,9 +88,11 @@ public:
 
     // добавить элемент в очередь
     void push(char s) {
-        array[++end] = s;
-        if (empty())
-            begin = end;
+        if (has_size()) {
+            array[++end] = s;
+            if (empty())
+                begin = end;
+        }
     }
 
 
@@ -152,7 +149,7 @@ private:
     struct list {
         char data;
         list* next, * previous;
-    }  *end = nullptr, * begin = end, * del;
+    }  *end, *begin, *del;
 
 
     //создание первого элемента
@@ -168,6 +165,22 @@ private:
 
 
 public:
+
+
+    // конструктор по умолчанию
+    QueueD() {
+        end = nullptr;
+        begin = end;
+    }
+
+
+    // деструктор (по умолчанию)
+    ~QueueD() {
+        if (!is_empty()) {
+            for (end = begin->next; end != begin; del = end, end = end->next, delete del);
+            delete begin;
+        }
+    }
 
 
     //проверка на пустоту / если пусто вернет true
@@ -257,7 +270,7 @@ private:
 
 
     //размерность стэка и индекс-указатель на последний элемент
-    int size = NULL, top;
+    int size, top;
     char* array;
 
 
@@ -271,27 +284,30 @@ public:
 
 
     // задать размерность стэка
-    Stack(int n) {
-        this->~Stack();
+    Stack(int n = NULL) {
         size = n;
-        array = new char[size];
+        if(size)    // Если больше нуля и не равно NULL, то создать массив
+            array = new char[size];
         clear();
     }
 
 
     // удалить массив(стэк)
     ~Stack() {
-        if (size != NULL) {
+        if (size != NULL)
             delete[] array;
-            size = NULL;
-            clear();
-        }
     }
 
 
     // проверка на пустоту
     bool empty() {
-        return !((bool)(top + 1) || size == NULL);
+        return !(bool)(top + 1) || size == NULL;
+    }
+
+
+    // проверка: есть место или нет
+    bool has_size() {
+        return top + 1 < size;
     }
 
 
@@ -321,7 +337,7 @@ public:
 
     // добавить элемент в конец
     void push(char s) {
-        if (top < size)
+        if (has_size())
             array[++top] = s;
     }
 
