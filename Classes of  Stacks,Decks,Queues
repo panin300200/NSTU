@@ -12,7 +12,7 @@ private:
 
 
     // n - размерность. begin - первый элемент(индекс). end - последний элемент(индекс).
-    int size = NULL, begin = -1, end = begin;
+    int size = NULL, begin, end;
     char* array; // как сделать тип который захочет пользователь?
 
 
@@ -27,7 +27,8 @@ public:
 
 
     // задать размерность очереди
-    void size_of(int n) {
+    QueueS(int n) {
+        this->~QueueS();
         size = n;
         array = new char[size];
         clear();
@@ -35,15 +36,18 @@ public:
 
 
     // удаление памяти под матрицу
-    void del() {
-        if(size != NULL)
+    ~QueueS() {
+        if (size != NULL) {
             delete[] array;
+            size = NULL;
+            clear();
+        }
     }
 
 
     // проверка на пустоту
     bool empty() {
-        return !(bool)(begin + 1);
+        return !((bool)(begin + 1) || size == NULL);
     }
 
 
@@ -104,7 +108,7 @@ public:
     }
 
 
-    // ж) - функция приоритета очереди
+    // функция приоритета очереди
     void priority() {
 
         if (!empty()) {
@@ -253,24 +257,41 @@ private:
 
 
     //размерность стэка и индекс-указатель на последний элемент
-    int size = NULL, top = -1;
+    int size = NULL, top;
     char* array;
 
 
 public:
 
 
+    // очистка стэка
+    void clear() {
+        top = -1;
+    }
+
+
     // задать размерность стэка
-    void size(int n) {
+    Stack(int n) {
+        this->~Stack();
         size = n;
         array = new char[size];
         clear();
     }
 
 
+    // удалить массив(стэк)
+    ~Stack() {
+        if (size != NULL) {
+            delete[] array;
+            size = NULL;
+            clear();
+        }
+    }
+
+
     // проверка на пустоту
     bool empty() {
-        return !(top + 1);
+        return !((bool)(top + 1) || size == NULL);
     }
 
 
@@ -283,9 +304,17 @@ public:
 
 
     // получить последний элемент
-    char back() {
+    char getl() {
         if (!empty())
             return array[top];
+        return '\0';
+    }
+
+
+    // получить первый элемент
+    char getf() {
+        if (!empty())
+            return array[0];
         return '\0';
     }
 
@@ -297,24 +326,11 @@ public:
     }
 
 
-    // очистка стэка
-    void clear() {
-        top = -1;
-    }
-
-
     // распечатать стэк
     void print() {
         if (!empty())
             for (int i = 0; i < top + 1; i++)
                 cout << array[i] << ' ';
-    }
-
-
-    // удалить массив(стэк)
-    void del() {
-        if (size != NULL)
-            delete[] array;
     }
 
 
