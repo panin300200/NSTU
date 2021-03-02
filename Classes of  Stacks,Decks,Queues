@@ -106,8 +106,8 @@ public:
 
 
     // функция приоритета очереди
-    void priority() {
-
+    void priority(char s) {
+        push(s);
         if (!empty()) {
             char* copy_array = new char[end - begin + 1]; // массив
 
@@ -130,7 +130,6 @@ public:
 
             // очистка копии и вывод оснв. массив
             delete[] copy_array;
-            print();
         }
     }
 
