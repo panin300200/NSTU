@@ -1,0 +1,184 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+
+namespace str {
+    using std::cin;
+    using std::cout;
+    using std::endl;
+    using std::ifstream;
+    constexpr auto STR = 80;
+    typedef char string[STR];
+}
+using namespace str;
+
+
+class Root {
+public:
+    //fields
+    string name;
+    Root* left, * right;
+};
+
+
+class Tree {
+private:
+
+
+    //field which is a root of binary tree
+    Root* start{ nullptr };
+
+
+    // methods
+    void delete_of_tree(Root* root) {
+        if (!root) return;
+        delete_of_tree(root->left);
+        delete_of_tree(root->right);
+        delete root;
+    }
+
+
+    void istack(Root*& stack, Root*& root, unsigned short count = -1) {
+        auto buffer = new Root;
+        if (count >= 0) buffer->name[0] = static_cast<char>(count);
+        buffer->left = stack;
+        buffer->right = root;
+        stack = buffer;
+    }
+
+
+    void ostack(Root*& stack, Root*& root) {
+        if (!stack) return;
+        auto del(stack);
+        root = stack->right;
+        stack = stack->left;
+        delete del;
+    }
+
+
+    void ostack(Root*& stack, Root*& root, short& count) {
+        if (!stack) return;
+        auto del(stack);
+        count = static_cast<int>(stack->name[0]);
+        root = stack->right;
+        stack = stack->left;
+        delete del;
+    }
+
+
+    auto search(Root* root, string name) {
+        Root* stack(nullptr);
+        while (root) {
+            if (!strcmp(root->name, name)) break;
+            if (root->left && root->right) {
+                istack(stack, root->right);
+                root = root->left;
+            }
+            else if (!root->left && !root->right) {
+                if (stack) ostack(stack, root);
+                else root = nullptr;
+            }
+            else
+                root = (root->left) ? root->left : root->right;
+        }
+        return root;
+    }
+
+
+public:
+
+
+    Tree(const string name_of_file) {
+        ifstream file(name_of_file);
+        if (file.is_open() && !file.eof()) {
+            for (string emp, master; !file.eof();) {
+                file >> emp >> master >> master;
+                emp[strlen(emp) - 1] = '\0';
+                Root* elem = search(start, master); // здесь изменился старт
+                if (elem) {
+                    auto buffer(new Root);
+                    strcpy_s(buffer->name, emp);
+                    buffer->left = buffer->right = nullptr;
+                    elem->left ? elem->right = buffer : elem->left = buffer;
+                }
+                else {
+                    elem = new Root;
+                    strcpy_s(elem->name, master);
+                    elem->right = nullptr;
+                    elem->left = search(start, emp);
+                    if (!elem->left) {
+                        elem->left = new Root;
+                        strcpy_s(elem->left->name, emp);
+                        elem->left->left = elem->left->right = nullptr;
+                    }
+                    start = elem;
+                }
+            }
+        }
+        else cout << "Ошибка! Файл пуст или невозможно открыть его!" << endl;
+        file.close();
+    }
+
+
+    bool empty() const {
+        return start;
+    }
+
+
+    ~Tree() {
+        if (!empty()) delete_of_tree(start);
+    }
+
+
+    auto get_root() const {
+        return start;
+    }
+
+
+    auto round(Root* root, string name) {
+        short count(0);
+        Root* stack(nullptr);
+        bool flag(false);
+        while (root) {
+            //cout << endl << root->name << '\t' << count << endl;
+            if (!strcmp(root->name, name)) {
+                flag = !flag;
+                break;
+            }
+            if (root->left && root->right) {
+                istack(stack, root->right, ++count);
+                root = root->left;
+            }
+            else if (!root->left && !root->right) {
+                if (stack) ostack(stack, root, count);
+                else root = nullptr;
+            }
+            else
+                root = root->left ? root->left : root->right;
+        }
+        return flag ? count : -1;
+    }
+
+
+    void print(Root* root) {
+        if (!root) return;
+        cout << root->name << endl;
+        print(root->left);
+        print(root->right);
+    }
+};
+
+
+int main() {
+    setlocale(0, "ru");
+    Tree groot("input.txt");
+    ifstream file("cin.txt");
+    string name;
+    file >> name;
+    file.close();
+    auto answer = groot.round(groot.get_root(), name);
+    if (answer == -1) cout << "\nНет такого сотрудника!\n";
+    else cout << endl << answer << endl;
+    return 0;
+}
